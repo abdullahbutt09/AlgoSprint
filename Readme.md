@@ -1,7 +1,7 @@
 # 🧠 AlgoSprint  
 
 ## Live Link
-- You can Check out the project here - https://algo-sprint.vercel.app/4
+- You can Check out the project here - https://algo-sprint.vercel.app
 ## 🎯 About the Project
 
 **AlgoSprint** is a gamified coding learning platform where you can:
