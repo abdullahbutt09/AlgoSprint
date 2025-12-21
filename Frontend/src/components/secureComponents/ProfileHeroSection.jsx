@@ -9,12 +9,14 @@ import { GiChoice } from "react-icons/gi";
 import { SiGoogleclassroom } from "react-icons/si";
 import { Button } from "../../components/ui/button";
 import { useClerk, useUser } from "@clerk/clerk-react";
+import FeedbackForm from "../FeedbackForm";
+import react, {useState} from "react";
 
 const ProfileHeroSection = () => {
-
   const { signOut } = useClerk();
   const navigate = useNavigate();
-  const {user} = useUser();
+  const { user } = useUser();
+  const [showFeedback, setShowFeedback] = useState(false);
   const username = user?.username;
 
   if (!username) {
@@ -30,6 +32,10 @@ const ProfileHeroSection = () => {
 
   const ToggleTheme = () => {
     document.documentElement.classList.toggle("dark");
+  };
+
+  const toggleFeedback = () => {
+    setShowFeedback((prev) => !prev);
   };
 
   return (
@@ -104,6 +110,16 @@ const ProfileHeroSection = () => {
         >
           Sign Out
         </Button>
+        <Button className="transition-all duration-75" variant={showFeedback ? "ghost" : "outline"} onClick={toggleFeedback}>
+          {showFeedback ? "Cancel" : "Give Feedback"}
+        </Button>
+
+        {showFeedback && (
+          <div className="absolute top-[5%] left-[2%] z-9999">
+            {" "}
+            <FeedbackForm />
+          </div>
+        )}
       </div>
     </div>
   );

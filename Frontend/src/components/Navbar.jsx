@@ -10,6 +10,7 @@ import { useState } from "react"
 import { CiDark } from "react-icons/ci";
 import { CiLight } from "react-icons/ci";
 
+
 const Navbar = () => {
 
   const navigate = useNavigate();
@@ -75,6 +76,7 @@ const Navbar = () => {
           <Skeleton className="h-8 w-[90px] rounded-md bg-slate-300" />
         )}
       </div>
+
     </div>
   );
 };

@@ -26,6 +26,7 @@ import { fetchRoomTitle } from "../controllers/mcqRooms.controller.js"
 import { clerkMiddleware} from "@clerk/express";
 import {handlePostReply} from "../controllers/user.controller.js"
 import { initialChangeRequest } from "../controllers/user.controller.js";
+import { feedbackController } from "../controllers/user.controller.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ const router = Router();
 router.use(clerkMiddleware());
 
 // ******************* PROFILE ROUTES ***************************//
+router.route("/user/feedback").post(feedbackController);
 router.route("/user/dashboard").get(dashboardController);
 router.route("/user/leaderboard").get(leaderboardStats);
 router

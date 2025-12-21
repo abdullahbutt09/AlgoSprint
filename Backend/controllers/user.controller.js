@@ -5,6 +5,7 @@ import { Match } from "../models/match.model.js";
 import { Discuss } from "../models/discuss.model.js";
 import uploadToCloudinary from "../Utils/cloudinary.js";
 import { Room } from "../models/room.model.js";
+import {Feedback} from "../models/feedback.model.js"
 
 const dashboardController = async (req, res, next) => {
   try {
@@ -315,6 +316,30 @@ const handlePostReply = async (req, res) => {
   }
 }
 
+const feedbackController = async (req, res) => {
+  try {
+    const {name, email, rating, message} = req.body;
+  if (!rating || !message) {
+    throw new ApiError(
+      404,
+      "Required information is not found in the request body"
+    );
+  }
+
+  const feedbackDetails = {
+    name: name, email: email, rating: rating, message: message
+  }
+  const feedback = await Feedback.create(feedbackDetails);
+  if(!feedback) {
+    throw new ApiError(505, "internal server error please try agian later");
+  }
+
+  res.status(200).json(new ApiResponse(200, "Feedback added successfully"))
+  } catch (err) {
+    throw new ApiError(404, err)
+  }
+}
+
 export {
   dashboardController,
   updateUserName,
@@ -324,4 +349,5 @@ export {
   discussionDataUpation,
   handlePostReply,
   initialChangeRequest,
+  feedbackController,
 };

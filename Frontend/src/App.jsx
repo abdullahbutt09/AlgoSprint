@@ -20,7 +20,7 @@ import McqArena from "./components/secureComponents/McqArena";
 import ResultPage from "./components/secureComponents/ResultPage";
 import McqResultPage from "./components/secureComponents/MCQResult";
 import McqLobby from "./components/secureComponents/McqLobby";
-import SsoCallback from "./components/Ssocallback"
+import SsoCallback from "./components/Ssocallback";
 
 const App = () => {
   const [clickEffects, setClickEffects] = useState([]);
