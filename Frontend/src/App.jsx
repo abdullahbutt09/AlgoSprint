@@ -13,6 +13,7 @@ import Signup from "./components/Signup";
 import { useEffect, useState } from "react";
 import { SignedIn } from "@clerk/clerk-react";
 import NotFound from "./components/NotFound";
+import ProtectedRouteChecker from "./components/ProtectedRouteChecker";
 import CollabEditor from "./components/secureComponents/EditorLayout";
 import CodingLobby from "./components/secureComponents/CodingLobby";
 import Playground from "./components/secureComponents/Playground";
@@ -63,28 +64,20 @@ const App = () => {
         </span>
       ))}
 
-      {/* Public Routes */}
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<WebsiteLayout />} />
         <Route path="/sso-callback" element={<SsoCallback />} />
+
         <Route path="/auth/*" element={<AuthenticationLayout />}>
           <Route path="signin" element={<Signin />} />
           <Route path="signup" element={<Signup />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
-      </Routes>
 
-      {/* Protected Routes */}
-      <SignedIn>
-        <Routes>
-          <Route path="/:username/" element={<ProfileLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="leaderboard" element={<Leaderboard />} />
-            <Route path="codingrooms" element={<CodingRooms />} />
-            <Route path="mcqrooms" element={<McqRooms />} />
-            <Route path="community" element={<Community />} />
-            <Route path="collaborativerooms" element={<CollaborativeRooms />} />
-          </Route>
-
+        {/* Protected routes - specific routes first */}
+        <Route element={<ProtectedRouteChecker />}>
+          {/* Other protected routes - BEFORE username route */}
           <Route path="/codingroom/:roomid/result" element={<ResultPage />} />
           <Route path="/mcqroom/:roomid/result" element={<McqResultPage />} />
           <Route path="/codingroom/:roomid/lobby" element={<CodingLobby />} />
@@ -92,11 +85,23 @@ const App = () => {
           <Route path="/room/:roomid" element={<CollabEditor />} />
           <Route path="/codingroom/:roomid/arena" element={<Playground />} />
           <Route path="/mcqrooms/:roomid/arena" element={<McqArena />} />
-          {/* <Route path="*" element={<NotFound />} /> */}
-        </Routes>
-      </SignedIn>
+
+          {/* Profile routes - AFTER specific routes */}
+          <Route path="/:username/*" element={<ProfileLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="codingrooms" element={<CodingRooms />} />
+            <Route path="mcqrooms" element={<McqRooms />} />
+            <Route path="community" element={<Community />} />
+            <Route path="collaborativerooms" element={<CollaborativeRooms />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Route>
+
+        {/* Catch-all for undefined routes - must be last */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </div>
   );
 };
-
 export default App;
