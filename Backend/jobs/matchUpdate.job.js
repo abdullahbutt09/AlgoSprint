@@ -3,7 +3,6 @@ import { Room } from "../models/room.model.js";
 import { User } from "../models/user.model.js";
 import { Ranking } from "../models/ranking.model.js";
 
-// Helper function: calculates rating change
 const calculateRatingChange = (outcome, position, totalParticipants) => {
   if (outcome === "WIN") {
     return Math.max(10, 100 - (position - 1) * 10);
@@ -16,23 +15,22 @@ const calculateRatingChange = (outcome, position, totalParticipants) => {
   }
 };
 
-// Cron Job: runs every 2 hours
 cron.schedule("0 */2 * * *", async () => {
   console.log("Cron Job Started: Updating room progress", new Date());
 
   try {
     const currentTime = new Date();
 
-    // Find rooms that ended but are still pending
     const expiredRooms = await Room.find({
       endTime: { $lt: currentTime },
       matchStatus: "pending",
     });
 
+    console.log("finding Unfinished Rooms");
+    console.log("got ", expiredRooms.length, "unfinished Rooms");
     for (const room of expiredRooms) {
       console.log("Processing room:", room.roomCode);
 
-      // Get finished participants and sort by score/timeTaken
       const finishedParticipants = room.participants
         .filter((p) => p.finished)
         .sort((a, b) => b.score - a.score || a.timeTaken - b.timeTaken);
@@ -73,8 +71,8 @@ cron.schedule("0 */2 * * *", async () => {
           if (user.currentRating < 0) user.currentRating = 0;
         }
 
-        if(user.currentRating >=0 && user.currentRating <= 100) {
-          user.rank = "Bronze"
+        if (user.currentRating >= 0 && user.currentRating <= 100) {
+          user.rank = "Bronze";
         } else if (user.currentRating >= 100 && user.currentRating <= 300) {
           user.rank = "Silver";
         } else if (user.currentRating >= 300 && user.currentRating <= 500) {
@@ -89,26 +87,23 @@ cron.schedule("0 */2 * * *", async () => {
           user.rank = "Legend";
         }
 
-          if (user.xp >= user.totalXp) {
-            // Handle leveling
-            user.level += 1;
-            user.xp -= user.totalXp;
-            user.totalXp += 50;
-          }
+        if (user.xp >= user.totalXp) {
+          user.level += 1;
+          user.xp -= user.totalXp;
+          user.totalXp += 50;
+        }
 
-        // Update highest rating
         if (user.currentRating > user.highestRating) {
           user.highestRating = user.currentRating;
         }
 
-        // Update ranking history
         let rankHistory = await Ranking.findOne({ userId: user._id });
         if (!rankHistory) {
           rankHistory = await Ranking.create({
             userId: user._id,
             ratings: [{ value: user.currentRating, date: new Date() }],
-          })
-          
+          });
+
           user.ratingHistory = rankHistory._id;
         } else {
           rankHistory.ratings.push({

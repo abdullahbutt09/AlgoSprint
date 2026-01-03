@@ -92,6 +92,12 @@ const ProfileHeroSection = () => {
         >
           <SiGoogleclassroom className="text-xl" /> <p>Collaborative Space</p>
         </NavLink>
+        <NavLink
+          to={`/${username}/feedback`}
+          className="list-none transition-all duration-300 flex gap-2 items-center justify-start hover:bg-black/10 dark:hover:bg-white/6 rounded-md px-3 py-[12px] text-sm text-black dark:text-white"
+        >
+          <SiGoogleclassroom className="text-xl" /> <p>Feedback</p>
+        </NavLink>
       </div>
 
       {/* Toggle and Sign Out */}
@@ -110,16 +116,6 @@ const ProfileHeroSection = () => {
         >
           Sign Out
         </Button>
-        <Button className="transition-all duration-75" variant={showFeedback ? "ghost" : "outline"} onClick={toggleFeedback}>
-          {showFeedback ? "Cancel" : "Give Feedback"}
-        </Button>
-
-        {showFeedback && (
-          <div className="absolute top-[5%] left-[2%] z-9999">
-            {" "}
-            <FeedbackForm />
-          </div>
-        )}
       </div>
     </div>
   );

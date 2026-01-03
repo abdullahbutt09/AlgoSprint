@@ -22,6 +22,7 @@ import ResultPage from "./components/secureComponents/ResultPage";
 import McqResultPage from "./components/secureComponents/MCQResult";
 import McqLobby from "./components/secureComponents/McqLobby";
 import SsoCallback from "./components/Ssocallback";
+import FeedbackForm from "./components/FeedbackForm";
 
 const App = () => {
   const [clickEffects, setClickEffects] = useState([]);
@@ -49,7 +50,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className="font-[Inter] bg-slate-50 dark:bg-black relative min-h-screen">
+    <div className="font-[Inter] bg-slate-50 dark:bg-black transition-all duration-400 relative min-h-screen">
       {clickEffects.map((c) => (
         <span
           key={c.id}
@@ -69,7 +70,7 @@ const App = () => {
         <Route path="/" element={<WebsiteLayout />} />
         <Route path="/sso-callback" element={<SsoCallback />} />
 
-        <Route path="/auth/*" element={<AuthenticationLayout />}>
+        <Route path="/auth/" element={<AuthenticationLayout />}>
           <Route path="signin" element={<Signin />} />
           <Route path="signup" element={<Signup />} />
           <Route path="*" element={<NotFound />} />
@@ -93,6 +94,7 @@ const App = () => {
             <Route path="codingrooms" element={<CodingRooms />} />
             <Route path="mcqrooms" element={<McqRooms />} />
             <Route path="community" element={<Community />} />
+            <Route path="feedback" element={<FeedbackForm />} />
             <Route path="collaborativerooms" element={<CollaborativeRooms />} />
             <Route path="*" element={<NotFound />} />
           </Route>

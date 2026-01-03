@@ -29,7 +29,6 @@ const ResultPage = () => {
 
   const [userProfile, setUserProfile] = useState({});
   const [userFinished, setUserFinished] = useState([]);
-  const [backendCallMade, setBackendCallMade] = useState(false);
 
   const timeLeft = startTime + totalTime - Math.floor(Date.now() / 1000);
 

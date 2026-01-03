@@ -67,17 +67,17 @@ const FeedbackForm = () => {
   };
 
   return (
-    <div className="min-w-md bg-zinc-200 dark:bg-zinc-100 shadow-md rounded-lg p-6 transition-all duration-105 animate-in">
-      <h3 className="text-xl font-semibold mb-1 text-black">
+    <div className="min-w-md bg-white dark:bg-black shadow-md rounded-lg p-6 transition-all duration-400 z-99 animate-in ">
+      <h3 className="text-xl font-semibold mb-1 text-black dark:text-white">
         Feedback for AlgoSprint
       </h3>
-      <p className="text-sm text-gray-700 mb-4">
+      <p className="text-sm text-gray-700 dark:text-gray-400 mb-4">
         Help us improve — quick feedback takes 30 seconds.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm dark:text-gray-400 font-medium text-gray-700 mb-2">
             Your rating
           </label>
           <div className="flex items-center gap-2">
@@ -114,20 +114,20 @@ const FeedbackForm = () => {
               })}
             </div>
 
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
               {rating > 0 ? `${rating} / 5` : "No rating yet"}
             </div>
           </div>
         </div>
 
         {/* Name & Email */}
-        <div className="grid grid-cols-1 text-gray-700 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 dark:text-gray-400 text-gray-700 md:grid-cols-2 gap-3">
           <input
             type="text"
             placeholder="Your name (optional)"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="px-3 py-2 border border-slate-400 rounded-md focus:ring-2 focus:ring-indigo-200 focus:border-indigo-700"
+            className="px-3 py-2 border dark:text-gray-400 border-slate-400 rounded-md focus:ring-2 focus:ring-indigo-200 focus:border-indigo-700"
           />
 
           <input
@@ -141,7 +141,7 @@ const FeedbackForm = () => {
 
         {/* Message */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block dark:text-gray-400 text-sm font-medium text-gray-700 mb-1">
             Feedback
           </label>
           <textarea
@@ -151,7 +151,7 @@ const FeedbackForm = () => {
             onChange={(e) => setMessage(e.target.value)}
             className="w-full px-3 py-2 border border-slate-400 rounded-md focus:ring-2 focus:ring-indigo-200 text-black focus:border-indigo-700"
           />
-          <div className="text-xs text-gray-400 mt-1">
+          <div className="text-xs dark:text-gray-400 text-gray-400 mt-1">
             Minimum 10 characters — optional
           </div>
         </div>
