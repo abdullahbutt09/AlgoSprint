@@ -123,7 +123,7 @@ const Dashboard = () => {
         <div className="bg-slate-50 dark:bg-black/80 transition-all duration-500 font-[Inter] px-16 pt-4 text-black dark:text-white min-h-screen">
           {data ? (
             <div className="flex items-center gap-10">
-              <div className="bg-slate-50 transition-all duration-500 dark:bg-[#111] rounded-xl basis-[80%] shadow-md">
+              <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 transition-colors duration-300 rounded-xl basis-[80%] shadow-sm">
                 <div className="p-4 shadow-lg transition-all duration-500 flex justify-between">
                   <div className="transition-all duration-500">
                     <h1 className="text-4xl p-1 font-bold flex items-center">
@@ -134,7 +134,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="pt-1 flex flex-col justify-between items-end gap-2">
-                    <div className="backdrop-blur-2xl text-sm bg-gradient-to-br from-indigo-400 to-purple-600 rounded-lg shadow-xs text-white px-2 py-1">
+                    <div className="text-xs font-medium tracking-wide uppercase bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-3 py-1 rounded-full">
                       {userDetails.rank}{" "}
                     </div>
                     <div className="font-bold text-sm">
@@ -156,11 +156,11 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="relative rounded-full transition-all duration-100 w-fit p-1 hover:scale-102 h-4/5 flex items-center justify-center bg-gray-200 dark:bg-[#111]">
+              <div className="relative rounded-full transition-opacity duration-300 w-fit p-1 hover:opacity-90 h-4/5 flex items-center justify-center bg-zinc-100 dark:bg-zinc-900">
                 <img
                   src={userDetails.profileImage}
                   alt="profile"
-                  className="w-42 h-40 relative rounded-full"
+                  className="w-42 h-40 relative rounded-full border border-zinc-200 dark:border-zinc-700"
                 />
               </div>
             </div>
@@ -169,9 +169,9 @@ const Dashboard = () => {
           )}
 
           <div className="flex items-center gap-2">
-            <div className="Area-chart max-w-md shadow-md mb-6 mt-6">
+            <div className="Area-chart max-w-md mb-6 mt-6 rounded-xl">
               {data ? (
-                <Card className="bg-white ring-[0.5px] dark:ring-white/20 dark:bg-white/4 shadow-md">
+                <Card className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-sm">
                   <CardHeader>
                     <CardTitle>Ranking Chart</CardTitle>
                     <CardDescription>
@@ -216,9 +216,9 @@ const Dashboard = () => {
 
             <div className="flex gap-2 flex-col w-4/9 items-center justify-center">
               {data ? (
-                <div className="bg-white ring-[0.5px] shadow-md dark:ring-white/20 dark:bg-white/4 w-full py-2 text-center p-2 text-md font-bold rounded-md">
+                <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 w-full py-3 text-center p-2 text-sm uppercase tracking-wide font-medium rounded-xl shadow-sm text-zinc-500 dark:text-zinc-400">
                   Total Win
-                  <p className="p-4 text-lg text-green-600 font-bold">
+                  <p className="p-3 text-2xl text-zinc-900 dark:text-zinc-100 font-bold">
                     {userDetails.totalWin}
                   </p>
                 </div>
@@ -226,9 +226,9 @@ const Dashboard = () => {
                 <Skeleton className="h-16 w-full rounded-md mb-6" />
               )}
               {data ? (
-                <div className="bg-white ring-[0.5px] shadow-md dark:ring-white/20 dark:bg-white/4 w-full text-center py-2 text-sm font-bold rounded-md">
+                <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 w-full py-3 text-center p-2 text-sm uppercase tracking-wide font-medium rounded-xl shadow-sm text-zinc-500 dark:text-zinc-400">
                   Win ratio
-                  <p className="p-4 text-orange-500 text-lg">
+                  <p className="p-3 text-2xl text-zinc-900 dark:text-zinc-100 font-bold">
                     {userDetails.winRatio}
                   </p>
                 </div>
@@ -238,8 +238,8 @@ const Dashboard = () => {
             </div>
 
             {data ? (
-              <div className="bg-white w-[30rem] h-[13rem] shadow-md ring-[0.5px] dark:ring-white/20 dark:bg-white/4 p-4 rounded-md">
-                <h1 className="text-center font-bold text-md">Badges Earned</h1>
+              <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 w-[30rem] h-[13rem] shadow-sm p-5 rounded-xl">
+                <h1 className="text-center font-medium uppercase tracking-widest text-xs text-zinc-500 dark:text-zinc-400">Badges Earned</h1>
                 <p className="gap-2 p-4 py-9 flex flex-wrap items-center justify-center">
                   {userDetails.title.length > 0 ? (
                     userDetails.title.map((elem, idx) => <Badge>{elem}</Badge>)
@@ -256,7 +256,7 @@ const Dashboard = () => {
             {feature.map((elem, idx) => (
               <div
                 key={idx}
-                className="bg-white ring-[0.5px] dark:ring-white/20 dark:bg-white/4 backdrop-blur-2xl shadow-md p-2 basis-[48%] mb-2 rounded-md"
+                className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-sm p-4 basis-[48%] mb-2 rounded-xl transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900"
               >
                 <div className="flex items-center justify-around">
                   <div>
@@ -266,7 +266,7 @@ const Dashboard = () => {
                   </div>
 
                   <div className="flex flex-col items-center justify-center">
-                    <p className="text-5xl font-bold">{elem.logo}</p>
+                    <p className="text-4xl text-zinc-400 dark:text-zinc-500">{elem.logo}</p>
                     <p className="text-sm text-gray-600 dark:text-[#A0AEC0] m-2">
                       {elem.discription}
                     </p>
@@ -276,7 +276,7 @@ const Dashboard = () => {
             ))}
           </div>
           {data ? (
-            <div className="my-4 rounded-md bg-white/4">
+            <div className="my-6 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
               <Table>
                 <TableCaption>Recent Battles</TableCaption>
                 <TableHeader className="font-[Inter]">
@@ -294,16 +294,20 @@ const Dashboard = () => {
                 <TableBody>
                   {recentMatchDataTable.length > 0 ? (
                     recentMatchDataTable.map((elem, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell className="font-medium p-4">
+                      <TableRow key={idx} className="hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
+                        <TableCell className="font-medium p-4 text-zinc-900 dark:text-zinc-100">
                           {elem.style}
                         </TableCell>
-                        <TableCell className="p-4">{elem.result}</TableCell>
                         <TableCell className="p-4">
+                          <span className={`text-xs font-semibold uppercase tracking-wider ${elem.result === 'Win' ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-500'}`}>
+                            {elem.result}
+                          </span>
+                        </TableCell>
+                        <TableCell className="p-4 text-zinc-600 dark:text-zinc-400">
                           {elem.numberOfParticipants}
                         </TableCell>
-                        <TableCell className="p-4 text-right">
-                          {elem.xpChanged}*
+                        <TableCell className="p-4 text-right font-medium text-zinc-900 dark:text-zinc-100">
+                          +{elem.xpChanged} XP
                         </TableCell>
                       </TableRow>
                     ))

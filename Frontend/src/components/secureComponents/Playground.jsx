@@ -49,9 +49,25 @@ const Playground = () => {
   const startTime = location.state.startTime;
   const navigate = useNavigate();
   const params = useParams();
-  const [language, setLanguage] = useState([]);
-  const [data, setData] = useState(false);
-  const [versions, setVersions] = useState([]);
+  // Language map for the editor (execution disabled — see banner)
+  const SUPPORTED_LANGUAGES = [
+    { label: "Python 3",   lang: "python",     monacoLang: "python",     starterKey: "python" },
+    { label: "JavaScript", lang: "javascript", monacoLang: "javascript", starterKey: "javascript" },
+    { label: "Java",       lang: "java",       monacoLang: "java",       starterKey: "java" },
+    { label: "C",          lang: "c",          monacoLang: "c",          starterKey: "c" },
+    { label: "C++",        lang: "c++",        monacoLang: "cpp",        starterKey: "cpp" },
+    { label: "Go",         lang: "go",         monacoLang: "go",         starterKey: "go" },
+    { label: "PHP",        lang: "php",        monacoLang: "php",        starterKey: "php" },
+  ];
+
+  // NOTE: Public code-execution APIs are no longer freely available.
+  // To re-enable execution, add a Judge0 RapidAPI key to .env as
+  // VITE_JUDGE0_API_KEY and restore the executeOnJudge0() helper.
+  const EXECUTION_ENABLED = false;
+
+  const [selectedLang, setSelectedLang] = useState(null);
+  const [executionBannerDismissed, setExecutionBannerDismissed] = useState(false);
+  const [data, setData] = useState(true);
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [problemLoading, setProblemLoading] = useState(true);
@@ -106,6 +122,7 @@ const Playground = () => {
         setProblemLoading(true);
         if (!roomid) return;
 
+        console.log("got room id", roomid)
         const response = await axios.get(
           "https://algosprint-vxi4.onrender.com/api/v1/user/codingrooms/arena/getProblems",
           {
@@ -116,12 +133,16 @@ const Playground = () => {
         if (response.data?.data?.questions) {
           setProblems(response.data.data.questions);
           setData(true);
+          console.log("")
           setErr(false);
         } else {
           throw new Error("No questions data received");
         }
       } catch (error) {
-        console.error("Error fetching questions:", error);
+        console.error(
+          "Error fetching questions in the function FetchQuestionsFromBackend:",
+          error
+        );
         setErr(true);
         setData(false);
       } finally {
@@ -198,28 +219,7 @@ const Playground = () => {
 
   
 
-  useEffect(() => {
-    let versionWithLanguage;
-    axios
-      .get("https://emkc.org/api/v2/piston/runtimes")
-      .then((response) => {
-        versionWithLanguage = response.data.filter((elem) => {
-          return (
-            elem.language === "python" ||
-            elem.language === "c" ||
-            elem.language === "c++" ||
-            elem.language === "java" ||
-            elem.language === "javascript" ||
-            elem.language === "go" ||
-            elem.language === "php"
-          );
-        });
-
-        setData(true);
-        setVersions(versionWithLanguage);
-      })
-      .catch((error) => console.log("error occured", error));
-  }, []);
+  // No runtime fetch needed — Judge0 uses static language IDs
 
   const handleEditorMount = (editor) => {
     editorRef.current[idx] = editor;
@@ -236,131 +236,16 @@ const Playground = () => {
     setCode(updatedCodeArray);
   };
 
-  const HandleRunRequest = async () => {
-
-    if(language.length <= 0) {
-      toast.error("PLease select a language first")
-      return;
-    }
-    setLoading(true);
-    let result = [];
-    for (let i = 0; i < 2; i++) {
-      const currentTestCase = problems[idx].problemTestCases[i].input.replace(
-        "sample_input_",
-        ""
-      );
-      const expectedOutcome = problems[idx].problemTestCases[
-        i
-      ].expectedOutput.replace("expected_output_", "");
-      const response = await axios.post(
-        "https://emkc.org/api/v2/piston/execute",
-        {
-          language: language[0],
-          version: language[1],
-          files: [
-            {
-              name: "main." + (language[0] === "c++" ? "cpp" : language[0]),
-              content: code[idx],
-            },
-          ],
-          stdin: currentTestCase,
-        }
-      );
-
-
-      const actualOutput = response.data.run.output.trim();
-      result.push({
-        currentTestCase,
-        expectedOutcome,
-        actualOutput,
-        correctness: expectedOutcome === actualOutput,
-        stdErr: String(response.data.compile.stderr),
-      });
-      setCodeOutput((prev) =>
-        prev.map((item, index) => (index === idx ? result : item))
-      );
-    }
-    setLoading(false);
+  const HandleRunRequest = () => {
+    // Execution is disabled — show banner instead
+    setExecutionBannerDismissed(false);
     setActiveTab("testResult");
-    setOutputRunned((prev) =>
-      prev.map((elem, index) => (index === idx ? true : elem))
-    );
   };
 
-  const HandleSubmitRequest = async () => {
-    setSubmitLoading(true);
-    let isCorrect = true;
-    let result = [];
-    for (let i = 0; i < problems[idx].problemTestCases.length; i++) {
-      const currentTestCase = problems[idx].problemTestCases[i].input.replace(
-        "sample_input_",
-        ""
-      );
-
-      const expectedOutcome = problems[idx].problemTestCases[
-        i
-      ].expectedOutput.replace("expected_output_", "");
-      const response = await axios.post(
-        "https://emkc.org/api/v2/piston/execute",
-        {
-          language: language[0],
-          version: language[1],
-          files: [
-            {
-              name: "main." + (language[0] === "c++" ? "cpp" : language[0]),
-              content: code[idx],
-            },
-          ],
-          stdin: currentTestCase,
-        }
-      );
-
-      const actualOutput = response.data.run.output.trim();
-      result.push({
-        currentTestCase,
-        expectedOutcome,
-        actualOutput,
-        correctness: expectedOutcome === actualOutput,
-        stdErr: String(response.data.compile.stderr),
-      });
-      setCodeSubmitOutput((prev) =>
-        prev.map((item, index) => (index === idx ? result : item))
-      );
-
-      if (result[i].correctness === false) {
-        isCorrect = false;
-        setSubmitOutput({
-          result: "Wrong Answer",
-          testCase: currentTestCase,
-          testCasePassed: i,
-          totalTestCase: problems[idx].problemTestCases.length,
-          yourOutput: actualOutput,
-          expectedOutput: expectedOutcome,
-          error: response.stderr,
-        });
-
-        break;
-      }
-    }
-
-    if (isCorrect) {
-      setSubmitOutput({
-        result: "Submitted",
-        testCasePassed: problems[idx].problemTestCases.length,
-        totalTestCase: problems[idx].problemTestCases.length,
-      });
-    }
-    setSubmitLoading(false);
+  const HandleSubmitRequest = () => {
+    // Execution is disabled — show banner instead
+    setExecutionBannerDismissed(false);
     setActiveTab("submit");
-    setCodeSubmitted((prev) =>
-      prev.map((elem, index) => (index === idx ? true : elem))
-    );
-
-    if (isCorrect) {
-      setQuestionDone((prev) =>
-        prev.map((elem, index) => (index === idx ? true : elem))
-      );
-    }
   };
 
   useEffect(() => {
@@ -376,14 +261,33 @@ const Playground = () => {
 
   return (
     <div className="h-screen flex-col">
-      <div className=" rounded-md flex font-[Inter] items-center p-4 pb-0 w-full">
+      {/* Execution-unavailable banner */}
+      {!executionBannerDismissed && (
+        <div className="flex items-center justify-between gap-3 bg-amber-50 border-b border-amber-200 px-4 py-2 text-amber-800 text-xs font-medium">
+          <span>
+            ⚠️ <strong>Code execution is currently unavailable.</strong> Public execution APIs are no longer free. You can still write &amp; read problems — execution can be re-enabled by the admin at any time.
+          </span>
+          <button
+            onClick={() => setExecutionBannerDismissed(true)}
+            className="ml-4 shrink-0 text-amber-600 hover:text-amber-900 font-bold text-sm leading-none"
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      <div className="mx-4 mt-4 flex font-[Inter] items-center p-3 w-full max-w-[calc(100%-2rem)] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-sm justify-between">
         <div>
           <Select
             onValueChange={(value) => {
-              const [lang, ver] = value.split(" ");
-              setLanguage([lang, ver]);
-              code[idx] =
-                lang === "c++" ? starterCode["cpp"] : starterCode[lang];
+              const lang = SUPPORTED_LANGUAGES.find((l) => l.lang === value);
+              if (lang) {
+                setSelectedLang(lang);
+                const updated = [...code];
+                updated[idx] = starterCode[lang.starterKey] || " ";
+                setCode(updated);
+              }
             }}
           >
             <SelectTrigger className="w-[180px]">
@@ -392,25 +296,21 @@ const Playground = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Language</SelectLabel>
-                {data &&
-                  versions.map((elem, idx) => (
-                    <SelectItem
-                      key={idx}
-                      value={`${elem.language} ${elem.version}`}
-                    >
-                      {`${elem.language} - ${elem.version}`}
-                    </SelectItem>
-                  ))}
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <SelectItem key={lang.lang} value={lang.lang}>
+                    {lang.label}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="mx-auto pr-[15%] flex items-center justify-center gap-2">
+        <div className="flex-1 flex justify-center gap-4">
           <Button
             size="sm"
             variant="outline"
-            className="mx-auto cursor-pointer w-24"
+            className="cursor-pointer w-28 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
             onClick={HandleRunRequest}
           >
             {loading ? <Loader /> : <p>Run Code</p>}
@@ -418,13 +318,13 @@ const Playground = () => {
           <Button
             size="sm"
             variant="personal"
-            className="mx-auto cursor-pointer w-24"
+            className="cursor-pointer w-28 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200"
             onClick={HandleSubmitRequest}
           >
             {submitLoading ? <Loader /> : <p>Submit</p>}
           </Button>
         </div>
-        <div className="mr-4 flex items-center justify-center gap-6">
+        <div className="flex items-center justify-end gap-6 mr-4">
           <div>
             <CountdownTimer
               initialSeconds={time}
@@ -461,7 +361,7 @@ const Playground = () => {
         >
           <ResizablePanel
             defaultSize={40}
-            className=" border-r-3 min-h-[85vh] max-h-[85vh] border-zinc-600 dark:bg-white/10"
+            className="border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 min-h-[85vh] max-h-[85vh]"
           >
             {problemLoading ? (
               <Skeleton className="h-full w-full" />
@@ -470,7 +370,7 @@ const Playground = () => {
             ) : data ? (
               <div className="h-full overflow-y-auto no-scrollbar">
                 <div className="p-6">
-                  <div className="w-full text-black dark:text-white font-bold font-[Inter] flex items-center justify-between px-2 text-2xl">
+                  <div className="w-full text-zinc-900 dark:text-zinc-100 font-bold font-[Inter] flex items-center justify-between px-4 py-3 text-xl bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
                     <GiFastBackwardButton
                       className="cursor-pointer"
                       onClick={() =>
@@ -534,17 +434,17 @@ const Playground = () => {
               <Skeleton className="h-full w-full"></Skeleton>
             )}
           </ResizablePanel>
-          <ResizableHandle />
+          <ResizableHandle className="w-[1px] bg-zinc-200 dark:bg-zinc-800 cursor-col-resize hover:bg-zinc-400 dark:hover:bg-zinc-600 transition-colors" />
           <ResizablePanel defaultSize={60}>
             <ResizablePanelGroup direction="vertical">
               <ResizablePanel
                 defaultSize={70}
-                className="w-full rounded-md overflow-hidden"
+                className="w-full overflow-hidden bg-zinc-950"
               >
                 <div className="flex py-2 pl-2 h-full items-center justify-center w-full ">
                   <Editor
                     className="w-full h-full"
-                    language={language[0] === "c++" ? "cpp" : language[0]}
+                    language={selectedLang?.monacoLang || "plaintext"}
                     value={code[idx]}
                     theme={"vs-dark"}
                     onMount={handleEditorMount}
@@ -553,13 +453,13 @@ const Playground = () => {
                 </div>
               </ResizablePanel>
 
-              <ResizableHandle />
+              <ResizableHandle className="h-[1px] bg-zinc-200 dark:bg-zinc-800 cursor-row-resize hover:bg-zinc-400 dark:hover:bg-zinc-600 transition-colors" />
               <ResizablePanel
                 defaultSize={30}
                 className="border-t-3 border-zinc-600 p-2"
               >
                 {" "}
-                <div className="flex bg-zinc-900 my-1 px-8 rounded-md pb-2 pt-2 text-sm items-center text-black justify-start gap-4 overflow-y-auto">
+                <div className="flex bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-6 py-2 text-sm items-center text-zinc-900 dark:text-zinc-100 justify-start gap-4 overflow-y-auto">
                   <div
                     onClick={() => setActiveTab("testResult")}
                     className={`px-4 py-2 font-bold cursor-pointer transition-all duration-100 
@@ -584,7 +484,7 @@ const Playground = () => {
                     Submit
                   </div>
                 </div>
-                <div className="flex flex-col bg-zinc-900 no-scrollbar rounded-md h-full w-full px-6 overflow-auto">
+                <div className="flex flex-col bg-white dark:bg-zinc-950 h-full w-full px-6 overflow-auto">
                   <div className="flex items-center gap-4 text-white">
                     {activeTab === "testResult" ? (
                       <div>
@@ -602,6 +502,15 @@ const Playground = () => {
                               </h1>
                             )
                           )}
+                        </div>
+
+                        {/* Execution unavailable notice in the output panel */}
+                        <div className="mt-4 mx-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3">
+                          <p className="text-amber-400 text-xs font-semibold mb-1">⚠️ Execution Unavailable</p>
+                          <p className="text-amber-300/80 text-xs leading-relaxed">
+                            Public code-execution APIs are no longer freely available. Running and auto-submitting code has been
+                            temporarily disabled. Your code is saved — execution can be re-enabled by connecting a Judge0 API key.
+                          </p>
                         </div>
 
                         <div className="flex text-sm flex-col mt-2 text-white">
@@ -721,8 +630,12 @@ const Playground = () => {
                             )}
                           </div>
                         ) : (
-                          <div className="flex mt-5 w-full font-bold ml-10 items-center justify-center text-center text-sm">
-                            no submissions yet
+                          <div className="mt-4 mx-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3">
+                            <p className="text-amber-400 text-xs font-semibold mb-1">⚠️ Execution Unavailable</p>
+                            <p className="text-amber-300/80 text-xs leading-relaxed">
+                              Code submission is temporarily disabled as public execution APIs are no longer free.
+                              Your work is saved and can be re-evaluated when a key is configured.
+                            </p>
                           </div>
                         )}
                       </div>
