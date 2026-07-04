@@ -123,86 +123,50 @@ const CodingLobby = () => {
     }
 
     const startLobbyGameFlow = async () => {
-      const updateCurrentRoomTimings = async () => {
-        await axios
-          .post(
-            "https://algosprint-vxi4.onrender.com/api/v1/user/codingrooms/updateRoomDetails",
-            {
-              roomCode: roomid,
-              time: time,
-            }
-          )
-          .then((res) => {
-            // console.log("Updated the timings of the room successfully");
-          })
-          .catch((err) => {
-            console.log("an error occur", err);
-          });
-      };
-      updateCurrentRoomTimings();
-
-      const FetchQuestionsFromTheBackend = async () => {
-        try {
-          const res = await axios.get(
-            "https://algosprint-vxi4.onrender.com/api/v1/user/codingrooms/arena/problems",
-            {
-              params: {
-                questions: Number(settings?.numberOfProblems),
-              },
-            }
-          );
-          const codingQuestions = res.data.data.questions;
-          setData(true);
-
-          await updateCurrentRoomSettings(codingQuestions);
-        } catch (err) {
-          console.log("some error occurred", err);
-          setData(false);
-        }
-      };
-
-      FetchQuestionsFromTheBackend();
-
-      const updateCurrentRoomSettings = async (codingQuestions) => {
-        // console.log("Final data going to backend:", codingQuestions);
+      try {
         await axios.post(
           "https://algosprint-vxi4.onrender.com/api/v1/user/codingrooms/updateRoomDetails",
-          {
-            roomCode: roomid,
-            questions: codingQuestions,
-            
-          }
+          { roomCode: roomid, time: time }
+        ).catch((err) => console.log("Error updating room timings:", err));
+
+        const res = await axios.get(
+          "https://algosprint-vxi4.onrender.com/api/v1/user/codingrooms/arena/problems",
+          { params: { questions: Number(settings?.numberOfProblems) } }
         );
-      };
-    }
+
+        const codingQuestions = res.data.data.questions;
+
+        await axios.post(
+          "https://algosprint-vxi4.onrender.com/api/v1/user/codingrooms/updateRoomDetails",
+          { roomCode: roomid, questions: codingQuestions }
+        );
+
+        navigate(`/codingroom/${roomid}/arena`, {
+          state: {
+            setting: settings,
+            username: username,
+            time: time,
+            topic: topic,
+            roomid,
+            realUsername,
+            totalQuestions: roomSettingData[0] || settings?.numberOfProblems,
+            startTime: Math.floor(Date.now() / 1000),
+            totalParticipants: players.length,
+          },
+        });
+      } catch (err) {
+        console.log("Error in startLobbyGameFlow:", err);
+        toast.error("Failed to start the game. Please try again.");
+      }
+    };
 
     startLobbyGameFlow();
-
-    // console.log("The startTime is", Math.floor(Date.now() / 1000));
-
-    if(data) {
-      navigate(`/codingroom/${roomid}/arena`, {
-        state: {
-          setting: settings,
-          username: username,
-          time: time,
-          topic: topic,
-          roomid,
-          realUsername,
-          totalQuestions: roomSettingData[0],
-          startTime: Math.floor(Date.now()/1000),
-          totalParticipants: players.length
-        },
-      });
-    } else {
-      return;
-    }
     
   }, [players]);
 
   return (
     <div
-      className="min-h-screen relative font-[Inter] text-white"
+      className="min-h-screen relative font-[Inter] text-zinc-900 dark:text-zinc-100"
       style={{
         backgroundImage: `url(${lobbybackground})`,
         backgroundSize: "cover",
@@ -210,76 +174,77 @@ const CodingLobby = () => {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="absolute inset-0 bg-white/2" />
-
-      <div className="relative z-10 p-10 pt-5 animate-fadeIn">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-center text-4xl font-extrabold p-4">
+      <div className="relative z-10 px-10 py-2  animate-in fade-in duration-1000 max-w-4xl mx-auto">
+        <div className=" border border-zinc-200 dark:border-zinc-800 p-8 rounded-xl shadow-sm mt-2">
+          <h1 className="text-center text-4xl font-extrabold px-4 text-white uppercase tracking-tight">
             Waiting Lobby
           </h1>
 
-          <p className="text-center mt-4 text-sm font-bold underline">
-            atleast 2 coders are needed to begin the battle
+          <p className="text-center text-sm text-zinc-500 font-medium">
+            At least 2 coders are needed to begin the battle
           </p>
 
-          <div className="mt-16 mb-2">
-            <div className="text-center flex items-center gap-4 font-bold justify-center text-white">
-              <p>PlayStyle: {roomSettingData[1]}</p>
-              <p>Problems: {roomSettingData[0]}</p>
+          <div className="mt-2 mb-6 backdrop-blur-sm bg-black/10 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm w-fit mx-auto">
+            <div className="text-center flex items-center gap-8 font-bold justify-center text-zinc-800 dark:text-zinc-200">
+              <p className="flex flex-col"><span className="text-xs text-zinc-300 uppercase tracking-widest">PlayStyle</span> <span className="text-lg text-zinc-400">{roomSettingData[1]}</span></p>
+              <div className="w-[1px] h-8 bg-zinc-200"></div>
+              <p className="flex flex-col"><span className="text-xs text-zinc-300 uppercase tracking-widest">Problems</span> <span className="text-lg text-zinc-400">{roomSettingData[0]}</span></p>
             </div>
           </div>
 
           <div
-            className="flex border-2 h-[40vh] overflow-y-auto max-w-[600px] mx-auto flex-wrap 
-               border-red-300 items-center justify-center p-10 m-10 mt-4 mb-4 rounded-md
-               bg-black/30 backdrop-blur-sm"
+            className="flex border border-zinc-200 dark:border-zinc-800 h-[40vh] overflow-y-auto max-w-[600px] mx-auto flex-wrap 
+               items-center justify-center px-8 m-10 mt-4 mb-4 rounded-xl
+               backdrop-blur-sm bg-black/20 shadow-inner gap-4"
           >
             {players.map((elem, idx) => (
-              <div key={idx} className="basis-[24%] text-center">
-                {elem.avatar}
-                <p
-                  className={`${
-                    elem.ready ? "text-green-500" : "text-red-500"
-                  } text-sm font-bold`}
-                >
-                  {elem.name}
-                </p>
+              <div key={idx} className="basis-[24%] text-center flex flex-col items-center">
+                <div className={`rounded-full p-1 border-2 transition-colors duration-300 ${elem.ready ? "border-green-500 bg-green-50 dark:bg-green-900/20" : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"}`}>
+                  {elem.avatar}
+                </div>
+                <div className="flex items-center gap-2 mt-3">
+                  <span className={`w-2 h-2 rounded-full ${elem.ready ? "bg-green-500" : "bg-zinc-300 dark:bg-zinc-700"}`}></span>
+                  <p
+                    className={`text-sm font-semibold tracking-wide ${
+                      elem.ready ? "text-green-600 dark:text-green-400" : "text-zinc-600 dark:text-zinc-400"
+                    }`}
+                  >
+                    {elem.name}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="font-bold test-sm pb-4 text-center">
-            coders Joined : <span>{players.length}</span>
+          <div className="font-bold text-xs pb-4 text-center text-zinc-500 tracking-widest uppercase">
+            Coders Joined : <span className="text-zinc-900 dark:text-zinc-100 text-sm ml-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 px-3 py-1 rounded-full">{players.length}</span>
           </div>
 
           <div className="flex items-center gap-4 justify-center">
             <Button
-              className="border-3 shadow-md hover:bg-white/20 cursor-pointer"
+              className={`border border-zinc-200 dark:border-zinc-800 shadow-sm cursor-pointer px-8 py-4 text-lg rounded-xl transition-all duration-300 ${players.find((player) => player.name === username)?.ready ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700" : "bg-green-600 hover:bg-green-700 text-white"}`}
               variant="outline"
-              size="sm"
               onClick={() => handleReadyLogic(username)}
             >
               {players.find((player) => player.name === username)?.ready
-                ? "Cancel"
-                : "Ready"}
+                ? "Cancel Ready"
+                : "Ready to Battle"}
             </Button>
             <Button
-              className="border-3 shadow-md cursor-pointer"
-              variant="destructive"
-              size="sm"
+              className="shadow-sm cursor-pointer rounded-xl px-6 py-4 border border-red-200 dark:border-red-900 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950 dark:hover:bg-red-900"
+              variant="outline"
               onClick={() => {
                 toast.success("Leaved the room successfully!");
                 navigate(`/${realUsername}/codingrooms`, { replace: true });
               }}
             >
-              leave
+              Leave Room
             </Button>
             <Button
-              className="border-3 shadow-md cursor-pointer hover:bg-white/20"
-              size="sm"
+              className="shadow-sm cursor-pointer bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 rounded-xl px-6 py-4"
               onClick={() => handleCopyTask()}
             >
-              Copy Id
+              {copied ? "Copied!" : "Copy Room ID"}
             </Button>
           </div>
         </div>

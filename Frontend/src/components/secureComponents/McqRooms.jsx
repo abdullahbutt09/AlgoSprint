@@ -193,10 +193,10 @@ const McqRooms = () => {
   }
 
   return (
-    <div className="bg-slate-50 transition-all duration-500 dark:bg-black/80 text-black dark:text-white font-[Inter] p-5">
-      <div className="dark:bg-[#111] transition-all duration-500 bg-slate-50 shadow-md p-5 rounded-md">
+    <div className="bg-white transition-colors duration-300 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-[Inter] p-8 min-h-screen">
+      <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl shadow-sm mb-8">
         <div className="flex gap-4 items-center">
-          <div className="dark:bg-[#222] transition-all duration-500 bg-slate-100 text-black dark:text-white shadow-md px-2 py-2 text-4xl rounded-xl">
+          <div className="bg-white shadow-sm dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 px-4 py-4 text-3xl rounded-xl text-zinc-900 dark:text-zinc-100">
             <GiMultipleTargets />
           </div>
           <div>
@@ -211,7 +211,7 @@ const McqRooms = () => {
         </div>
       </div>
 
-      <h1 className="text-center font-bold text-2xl text-black dark:text-white pt-10">
+      <h1 className="text-center font-bold text-3xl text-zinc-900 dark:text-zinc-100 pt-10 tracking-tight uppercase">
         Join Public Room
       </h1>
 
@@ -254,34 +254,34 @@ const McqRooms = () => {
         </Dialog>
       </div>
 
-      <div className="border-t-2 border-cyan-400 w-full my-6 border-dashed"></div>
+      <div className="border-t border-zinc-200 dark:border-zinc-800 w-full my-12"></div>
 
-      <div className="flex items-center mt-6 text-2xl font-bold justify-center gap-4 text-black dark:text-white">
+      <div className="flex items-center mt-6 text-3xl font-bold justify-center gap-4 text-zinc-900 dark:text-zinc-100 tracking-tight uppercase">
         Create your room
       </div>
       <div className="flex items-center transition-all duration-500 flex-wrap max-w-[900px] mx-auto p-4">
         {quizList.map((elem, idx) => (
           <div
             key={idx}
-            className="flex  px-4 flex-col basis-[48%] border transition-all duration-500 border-white/20 p-2 bg-slate-20 shadow-md ring-2 dark:ring-0 ring-slate-200 dark:bg-[#1a1a1a] m-2 rounded-md"
+            className="flex px-6 py-4 flex-col basis-[48%] border transition-all duration-500 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md hover:bg-zinc-50 dark:hover:bg-zinc-800 m-2 rounded-xl"
           >
             <div className="flex items-center justify-between">
               <div className="space-y-4">
-                <h1 className="text-black dark:text-white font-bold m-2">
+                <h1 className="text-zinc-900 dark:text-zinc-100 font-bold m-2 text-xl tracking-tight">
                   {elem.name}
                 </h1>
-                <div className="flex items-center gap-4 text-xs m-2">
+                <div className="flex items-center gap-4 text-sm m-2 text-zinc-600 dark:text-zinc-400">
                   <p>{elem.Questions} questions</p>
                   <p className="font-bold">{elem.time}</p>
                 </div>
-                <div className="text-black dark:text-white text-xs m-2">
-                  *{elem.reward}
+                <div className="text-green-600 dark:text-green-400 font-medium text-xs m-2 uppercase tracking-widest">
+                  * Reward: {elem.reward}
                 </div>
                 <div className="w-full flex mt-4 gap-4 items-center justify-start">
                   <Button
                     size="sm"
-                    className="w-24"
-                    variant="personal"
+                    className="w-24 border-zinc-200 dark:border-zinc-800 bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 shadow-sm transition-colors"
+                    variant="outline"
                     onClick={() => handleCreateLogic(elem.name, idx)}
                   >
                     {loading[idx] ? <Loader></Loader> : <p>create</p>}
